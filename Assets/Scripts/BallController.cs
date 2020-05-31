@@ -18,9 +18,14 @@ namespace app
 
 	public class BallController : MonoBehaviour
 	{
-		#region フィールド
-		private SpriteRenderer SpriteRenderer;
-        private BoardPoint BoardPoint;
+        #region プロパティ
+        public BallType ballType { get; set; }
+        public BoardPoint boardPoint { get; set; }
+        #endregion
+
+        #region フィールド
+        private SpriteRenderer SpriteRenderer;
+        
 		#endregion
 
 		#region MonoBehaviorメソッド
@@ -38,8 +43,9 @@ namespace app
 
 		void Update()
 		{
+            
+        }
 
-		}
 		#endregion
 
 		#region 公開メソッド
@@ -56,7 +62,7 @@ namespace app
 				SpriteRenderer = gameObject.GetComponent<SpriteRenderer>();
 			}
 
-			SpriteRenderer.sprite = sprite;
+            SpriteRenderer.sprite = sprite;
 
 		}
 		#endregion

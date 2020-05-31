@@ -64,6 +64,7 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\BallController.cs" />
     <Compile Include="Assets\Scripts\BoardController.cs" />
+    <Compile Include="Assets\Scripts\LogDrawer.cs" />
     <Compile Include="Assets\Scripts\PuzzleManager.cs" />
     <Reference Include="UnityEngine">
       <HintPath>/Applications/Unity/Hub/Editor/2019.3.12f1/2019.3.14f1/2019.3.14f1/Unity.app/Contents/Managed/UnityEngine/UnityEngine.dll</HintPath>

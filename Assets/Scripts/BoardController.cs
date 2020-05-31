@@ -70,6 +70,19 @@ namespace app
             generateBoard();
         }
 
+        public void Update()
+        {
+            
+        }
+
+        public void LateUpdate()
+        {
+            #region DEBUG
+            drawDebugLog();
+            #endregion
+
+        }
+
         /// <summary>
         /// 盤面上のボールを生成する
         /// </summary>
@@ -82,23 +95,31 @@ namespace app
             {
                 for(int x = 0;x<XPOINTMAX;x++)
                 {
-                    generateBall(BallType.Green, new BoardPoint(x, y));
+                    Board[y,x] = generateBall(BallType.Green, new BoardPoint(x, y));
                 }
             }
         }
+
         /// <summary>
         /// ボールプレハブをインスタンス化し生成する
         /// </summary>     
-        private void generateBall(BallType ballType, BoardPoint point)
+        private BallController generateBall(BallType ballType, BoardPoint point)
         {
             /// BoardPointの数値から、具体的な座標を計算し、生成する
             var newBallPos = convertPointToPos(point);
+
             var newBall = Instantiate(BallPrefab, newBallPos, Quaternion.identity);
+
+            /// コントローラーセットアップ
             var ballContorller = newBall.GetComponent<BallController>();
             if (ballContorller != null)
             {
                 ballContorller.setSprite(selectBallSprite(ballType));
+                ballContorller.ballType = ballType;
+                ballContorller.boardPoint = point;
             }
+
+            return ballContorller;
         }
         
         /// <summary>
@@ -144,5 +165,25 @@ namespace app
 
             return null;
         }
+
+        #region DEBUG
+        private void drawDebugLog()
+        {
+            ///盤面デバッグ表示
+            string log = "";
+            for (int y = 0; y < YPOINTMAX; y++)
+            {
+                for (int x = 0; x < XPOINTMAX; x++)
+                {
+                    log += Board[y, x].ballType.ToString() + " ";
+                }
+
+                log += "\n";
+            }
+
+            LogDrawer.drawLog(log);
+        }
+
+        #endregion
     }
 }
