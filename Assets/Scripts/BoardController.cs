@@ -48,8 +48,21 @@ namespace app
         #endregion
 
         #region フィールド
+        /*
+         * (0,0) (1,0) (2,0) (3,0) (4,0) (5,0)
+         * (0,1) (1,1) (2,1) (3,1) (4,1) (5,1)
+         * (0,2) (1,2) (2,2) (3,2) (4,2) (5,2)
+         * (0,3) (1,3) (2,3) (3,3) (4,3) (5,3) 
+         * (0,4) (1,4) (2,4) (3,4) (4,4) (5,4) 
+         */
         private BallController[,] Board;
+        private SpriteRenderer Renderer;
         #endregion
+
+        public void Awake()
+        {
+            Renderer = gameObject.GetComponent<SpriteRenderer>();    
+        }
 
         public void Start()
         {
@@ -69,7 +82,7 @@ namespace app
             {
                 for(int x = 0;x<XPOINTMAX;x++)
                 {
-                    generateBall(BallType.Red, new BoardPoint(x, y));
+                    generateBall(BallType.Green, new BoardPoint(x, y));
                 }
             }
         }
@@ -93,9 +106,16 @@ namespace app
         /// </summary>
         private Vector3 convertPointToPos(BoardPoint point)
         {
-            ///とりあえずマージン50で変換
-            var margin = 1.88f;
-            return new Vector3(point.x * margin, point.y * margin, 0.0f);
+            var centerPos = gameObject.GetComponent<Transform>().position;
+            ///一つのセルは正方形なので、一辺の長さはxとyで同じ
+            var cellSize = Renderer.size.x / XPOINTMAX;
+
+            var originPos = centerPos + new Vector3(
+                -Renderer.size.x/2 + cellSize/2,
+                Renderer.size.y/2 - cellSize/2 );
+
+            return originPos +
+                new Vector3(point.x * cellSize, -point.y * cellSize, 0.0f);
         }
 
         /// <summary>
