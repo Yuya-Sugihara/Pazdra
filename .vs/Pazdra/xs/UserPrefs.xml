@@ -1,8 +1,9 @@
 ﻿<Properties StartupConfiguration="{436A0EA7-FA30-DA30-7BA9-35681982EB9B}|">
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/BallController.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/BoardController.cs">
     <Files>
-      <File FileName="Assets/Scripts/PuzzleManager.cs" Line="68" Column="43" />
-      <File FileName="Assets/Scripts/BallController.cs" Line="1" Column="1" NotebookId="1" />
+      <File FileName="Assets/Scripts/PuzzleManager.cs" Line="51" Column="1" />
+      <File FileName="Assets/Scripts/BoardController.cs" Line="6" Column="2" />
+      <File FileName="Assets/Scripts/BallController.cs" Line="49" Column="19" NotebookId="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />

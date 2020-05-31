@@ -20,6 +20,7 @@ namespace app
 	{
 		#region フィールド
 		private SpriteRenderer SpriteRenderer;
+        private BoardPoint BoardPoint;
 		#endregion
 
 		#region MonoBehaviorメソッド

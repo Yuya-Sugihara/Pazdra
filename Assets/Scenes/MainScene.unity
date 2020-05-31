@@ -150,14 +150,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f889d7151e4bd4b24a39b1db6f50b22c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BallPrefab: {fileID: 5809823994854208683, guid: c4f47ee65a9ea4577ae10d8f9bbb6e61,
-    type: 3}
-  RedBallSprite: {fileID: 21300000, guid: bd861dc7c29e7449ba59e9057356088b, type: 3}
-  BlueBallSprite: {fileID: 21300000, guid: 14ffc838e25df419a992ccd6f0a213d4, type: 3}
-  GreenBallSprite: {fileID: 21300000, guid: 3ac6f564d7f3f4cecaa1e53828b83dc8, type: 3}
-  YellowBallSprite: {fileID: 21300000, guid: 5c6e81031514142a4a75b8bbfa049ede, type: 3}
-  PurpleBallSprite: {fileID: 21300000, guid: e5d097042f0bd4175a8925f84bc7997c, type: 3}
-  PinkBallSprite: {fileID: 21300000, guid: edd1b91edab664c9582de6f78703b548, type: 3}
 --- !u!4 &16284696
 Transform:
   m_ObjectHideFlags: 0
@@ -265,8 +257,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1116990588}
   - component: {fileID: 1116990587}
+  - component: {fileID: 1116990589}
   m_Layer: 0
-  m_Name: BackGround
+  m_Name: Board
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -308,8 +301,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1767617213
+  m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 4f66fcbdb225b4a34950cb219eb7f737, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -336,7 +329,27 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &2142535527736880823
+--- !u!114 &1116990589
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1116990586}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1a3534e41df04157a7b5c0c84ff3e76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BallPrefab: {fileID: 5809823994854208683, guid: c4f47ee65a9ea4577ae10d8f9bbb6e61,
+    type: 3}
+  RedBallSprite: {fileID: 21300000, guid: bd861dc7c29e7449ba59e9057356088b, type: 3}
+  BlueBallSprite: {fileID: 21300000, guid: 14ffc838e25df419a992ccd6f0a213d4, type: 3}
+  GreenBallSprite: {fileID: 21300000, guid: 3ac6f564d7f3f4cecaa1e53828b83dc8, type: 3}
+  YellowBallSprite: {fileID: 21300000, guid: 5c6e81031514142a4a75b8bbfa049ede, type: 3}
+  PurpleBallSprite: {fileID: 21300000, guid: e5d097042f0bd4175a8925f84bc7997c, type: 3}
+  PinkBallSprite: {fileID: 21300000, guid: edd1b91edab664c9582de6f78703b548, type: 3}
+--- !u!1001 &1482475957
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -347,7 +360,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: bd861dc7c29e7449ba59e9057356088b,
+      objectReference: {fileID: 21300000, guid: 3ac6f564d7f3f4cecaa1e53828b83dc8,
         type: 3}
     - target: {fileID: 1434980999325502311, guid: c4f47ee65a9ea4577ae10d8f9bbb6e61,
         type: 3}
@@ -364,20 +377,35 @@ PrefabInstance:
       propertyPath: m_WasSpriteAssigned
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1434980999325502311, guid: c4f47ee65a9ea4577ae10d8f9bbb6e61,
+        type: 3}
+      propertyPath: m_SortingLayerID
+      value: -163492275
+      objectReference: {fileID: 0}
+    - target: {fileID: 1434980999325502311, guid: c4f47ee65a9ea4577ae10d8f9bbb6e61,
+        type: 3}
+      propertyPath: m_SortingLayer
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 5809823994854208683, guid: c4f47ee65a9ea4577ae10d8f9bbb6e61,
         type: 3}
       propertyPath: m_Name
       value: BallBase
       objectReference: {fileID: 0}
+    - target: {fileID: 5809823994854208683, guid: c4f47ee65a9ea4577ae10d8f9bbb6e61,
+        type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5855216911658131194, guid: c4f47ee65a9ea4577ae10d8f9bbb6e61,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.63
+      value: 0.41237798
       objectReference: {fileID: 0}
     - target: {fileID: 5855216911658131194, guid: c4f47ee65a9ea4577ae10d8f9bbb6e61,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2.39
+      value: -1.8622158
       objectReference: {fileID: 0}
     - target: {fileID: 5855216911658131194, guid: c4f47ee65a9ea4577ae10d8f9bbb6e61,
         type: 3}
