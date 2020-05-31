@@ -42,22 +42,60 @@ namespace app
         private Sprite PinkBallSprite = null;
         #endregion
 
+        #region 定数プロパティ
+        public int XPOINTMAX { get; } = 6; 
+        public int YPOINTMAX { get; } = 5;
+        #endregion
+
+        #region フィールド
+        private BallController[,] Board;
+        #endregion
+
         public void Start()
         {
-            generateBall(BallType.Blue, Vector3.zero, Quaternion.identity);
+            /// 盤面生成
+            generateBoard();
         }
 
         /// <summary>
+        /// 盤面上のボールを生成する
+        /// </summary>
+        private void generateBoard()
+        {
+            ///盤面データテーブル作成
+            Board = new BallController[YPOINTMAX,XPOINTMAX];
+
+            for(int y =0;y<YPOINTMAX;y++)
+            {
+                for(int x = 0;x<XPOINTMAX;x++)
+                {
+                    generateBall(BallType.Red, new BoardPoint(x, y));
+                }
+            }
+        }
+        /// <summary>
         /// ボールプレハブをインスタンス化し生成する
         /// </summary>     
-        private void generateBall(BallType ballType, Vector3 pos, Quaternion rotation)
+        private void generateBall(BallType ballType, BoardPoint point)
         {
-            var newBall = Instantiate(BallPrefab, pos, rotation);
+            /// BoardPointの数値から、具体的な座標を計算し、生成する
+            var newBallPos = convertPointToPos(point);
+            var newBall = Instantiate(BallPrefab, newBallPos, Quaternion.identity);
             var ballContorller = newBall.GetComponent<BallController>();
             if (ballContorller != null)
             {
                 ballContorller.setSprite(selectBallSprite(ballType));
             }
+        }
+        
+        /// <summary>
+        /// ボード位置のインデックスを座標に変換する
+        /// </summary>
+        private Vector3 convertPointToPos(BoardPoint point)
+        {
+            ///とりあえずマージン50で変換
+            var margin = 1.88f;
+            return new Vector3(point.x * margin, point.y * margin, 0.0f);
         }
 
         /// <summary>
