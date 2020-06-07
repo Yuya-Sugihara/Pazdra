@@ -27,6 +27,12 @@ namespace app
         }
     }
 
+    public struct Cell
+    {
+        public Vector3 cellPos { get; set; }
+        public Vector2 cellSize { get; set; }
+    }
+
     /// <summary>
     /// 盤面の情報を管理するクラス
     /// </summary>
@@ -53,6 +59,10 @@ namespace app
         #region 定数プロパティ
         public int XPOINTMAX { get; } = 6; 
         public int YPOINTMAX { get; } = 5;
+        #endregion
+
+        #region プロパティ
+        public BallController currentOperatingBall { get; private set; }
         #endregion
 
         #region フィールド
@@ -83,6 +93,14 @@ namespace app
             generateBoard();
         }
 
+        public void Update()
+        {
+            /////////////////////////////////////////
+            /// 操作中のボールの位置を監視する
+            /////////////////////////////////////////
+
+        }
+
         public void LateUpdate()
         {
             #region DEBUG
@@ -91,21 +109,52 @@ namespace app
         }
 
         #region 公開メソッド
+
+        #region データ取得
+        /// <summary>
+        /// 盤面座標取得
+        /// </summary>
         public Vector3 getBoardPos()
         {
             return Transform.position;
         }
 
         /// <summary>
-        /// 盤面スプライトのサイズを返す
+        /// 盤面サイズ取得
         /// </summary>
         public Vector2 getBoardSize()
         {
             return Renderer.size;
         }
+
+        /// <summary>
+        /// ボールタイプ取得
+        /// </summary>
+        public BallType getBoardBallType(Point point, Direction dir, int length = 1)
+        {
+            var ballController = Board.getElementByDirection(point, dir, length);
+            if (ballController == null)
+                return BallType.None;
+
+            return ballController.ballType;
+        }
+        #endregion
+
+        #region 操作ボール登録、解除
+        public void registerOperatingBall(BallController controller)
+        {
+            currentOperatingBall = controller;
+        }
+
+        public void unregisterOperatingBall()
+        {
+            currentOperatingBall = null;
+        }
         #endregion
 
         #region 非公開メソッド
+
+        #region ボール生成
         /// <summary>
         /// 盤面上のボールを生成する
         /// </summary>
@@ -241,23 +290,6 @@ namespace app
 
             return ballContorller;
         }
-        
-        /// <summary>
-        /// ボード位置のインデックスを座標に変換する
-        /// </summary>
-        private Vector3 convertPointToPos(Point point)
-        {
-            var centerPos = gameObject.GetComponent<Transform>().position;
-            ///一つのセルは正方形なので、一辺の長さはxとyで同じ
-            var cellSize = Renderer.size.x / XPOINTMAX;
-
-            var originPos = centerPos + new Vector3(
-                -Renderer.size.x/2 + cellSize/2,
-                Renderer.size.y/2 - cellSize/2 );
-
-            return originPos +
-                new Vector3(point.x * cellSize, -point.y * cellSize, 0.0f);
-        }
 
         /// <summary>
         /// ボールタイプに合わせてスプライトを選択する
@@ -286,15 +318,43 @@ namespace app
             return null;
         }
 
-        private BallType getBoardBallType(Point point,Direction dir,int length = 1)
-        {
-            var ballController = Board.getElementByDirection(point,dir,length);
-            if (ballController == null)
-                return BallType.None;
+        #endregion
 
-            return ballController.ballType;
+        #region データ変換
+        /// <summary>
+        /// ボード位置のインデックスを座標に変換する
+        /// </summary>
+        private Vector3 convertPointToPos(Point point)
+        {
+            var centerPos = gameObject.GetComponent<Transform>().position;
+            ///一つのセルは正方形なので、一辺の長さはxとyで同じ
+            var cellSize = Renderer.size.x / XPOINTMAX;
+
+            var originPos = centerPos + new Vector3(
+                -Renderer.size.x/2 + cellSize/2,
+                Renderer.size.y/2 - cellSize/2 );
+
+            return originPos +
+                new Vector3(point.x * cellSize, -point.y * cellSize, 0.0f);
         }
 
+        private Cell convertPointToCell(Point point)
+        {
+            var centerPos = gameObject.GetComponent<Transform>().position;
+
+            var cell = new Cell();
+            cell.cellPos = convertPointToPos(point);
+            cell.cellSize = new Vector2(
+                Renderer.size.x / XPOINTMAX,
+                Renderer.size.y / YPOINTMAX);
+
+            return cell;
+        }
+        #endregion
+
+
+      
+        
         #region DEBUG
         private void drawDebugLog()
         {

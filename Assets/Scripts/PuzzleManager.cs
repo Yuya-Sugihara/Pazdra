@@ -27,12 +27,27 @@ namespace app
             if(Instance == null)
                 Instance = this;
         }
+        #endregion
 
+        #region 公開メソッド
+
+        #region 登録、解除
         public void registerBoardController(BoardController controller)
         {
             BoardController = controller;
         }
 
+        public void registerCurrentOperationBall(BallController controller)
+        {
+            BoardController.registerOperatingBall(controller);
+        }
+
+        public void unregisterCurrentOperationBall()
+        {
+            BoardController.unregisterOperatingBall();
+        }
+
+        #region データアクセサ
         public Vector3 getBoardPos()
         {
             return BoardController.getBoardPos();
@@ -44,7 +59,9 @@ namespace app
         }
         #endregion
 
-      
+        #endregion
+
+
 
 
     }

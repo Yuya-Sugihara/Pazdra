@@ -15,133 +15,138 @@ namespace app
 		Pink,
         None
 	};
-	#endregion
+    #endregion
 
-	public class BallController : MonoBehaviour
-	{
-        #region 定義
-        public class BallStateBase
+    #region 定義
+
+    public class BallStateBase
+    {
+        public BallStateBase nextState { get; set; }
+        protected BallController ownerController { get; private set; }
+
+        public BallStateBase(BallController controller)
         {
-            public BallStateBase nextState { get; set; }
-            protected BallController ownerController { get; private set; }
+            nextState = null;
 
-            public BallStateBase(BallController controller)
-            {
-                nextState = null;
-
-                ownerController = controller;
-            }
-
-            public virtual void start()
-            {
-                nextState = null;
-            }
-
-            public virtual void update()
-            { }
-
-            public virtual void end()
-            { }
-        }
-        /// <summary>
-        /// 待機ステート
-        /// </summary>
-        public class StayState: BallStateBase
-        {
-            public StayState(BallController controller):
-                base(controller)
-            { }
-
-            ///ボールを選択されたらステート変更
-            public override void start()
-            {
-                base.start();
-            }
-
-            public override void update()
-            {
-                base.update();
-
-                ///　選択されているか判定
-                ///　とりあえず左クリックで判定
-                if(Input.GetMouseButtonDown(0))
-                {
-                    /// 範囲判定
-                    if (ownerController.isTouched())
-                    {
-                        Debug.Log("[StayState] changeState to Move");
-                        nextState = new MoveState(ownerController);
-                        return;
-                    }
-                }
-            }
-
-            public override void end()
-            {
-                base.end();
-            }
+            ownerController = controller;
         }
 
-        /// <summary>
-        /// 移動ステート
-        /// </summary>
-        public class MoveState: BallStateBase
+        public virtual void start()
         {
-            public MoveState(BallController controller):
-                base(controller)
-            { }
+            nextState = null;
+        }
 
-            /// <summary>
-            /// 入力が続いている間入力されている場所へ移動する
-            /// 入力が終わるとステート変更
-            /// 開始時に操作時間の初期化→更新していく
-            /// </summary>
-            public override void start()
+        public virtual void update()
+        { }
+
+        public virtual void end()
+        { }
+    }
+    /// <summary>
+    /// 待機ステート
+    /// </summary>
+    public class StayState : BallStateBase
+    {
+        public StayState(BallController controller) :
+            base(controller)
+        { }
+
+        ///ボールを選択されたらステート変更
+        public override void start()
+        {
+            base.start();
+        }
+
+        public override void update()
+        {
+            base.update();
+
+            ///　選択されているか判定
+            ///　とりあえず左クリックで判定
+            if (Input.GetMouseButtonDown(0))
             {
-                base.start();
-
-                ownerController.onSelectBall();                
-            }
-
-            public override void update()
-            {
-                base.update();
-
-                if(Input.GetMouseButtonUp(0))
+                /// 範囲判定
+                if (ownerController.isTouched())
                 {
-                    Debug.Log("[MoveState] changeState to Stay");
-                    nextState = new StayState(ownerController);
+                    Debug.Log("[StayState] changeState to Move");
+                    nextState = new MoveState(ownerController);
                     return;
                 }
-
-                move();
             }
-
-            public override void end()
-            {
-                base.end();
-
-                ownerController.offSelectBall();
-            }
-
-            private void move()
-            {
-                var inputPos = Input.mousePosition;
-                
-                var desirePos = Camera.main.ScreenToWorldPoint(inputPos);
-                desirePos.z = 0.0f;
-                ///ここで範囲盤面範囲から座標調整を行う
-                var adjustedPos = ownerController.adjustPos(desirePos);
-
-                var currentPos = ownerController.transform.position;
-                var targetPos = Vector3.Lerp(currentPos, adjustedPos, 0.2f);
-                ownerController.transform.position = targetPos;
-            }
-
-           
         }
 
-        #endregion
+        public override void end()
+        {
+            base.end();
+        }
+    }
+
+    /// <summary>
+    /// 移動ステート
+    /// </summary>
+    public class MoveState : BallStateBase
+    {
+        public MoveState(BallController controller) :
+            base(controller)
+        { }
+
+        /// <summary>
+        /// 入力が続いている間入力されている場所へ移動する
+        /// 入力が終わるとステート変更
+        /// 開始時に操作時間の初期化→更新していく
+        /// </summary>
+        public override void start()
+        {
+            base.start();
+
+            PuzzleManager.instance.registerCurrentOperationBall(ownerController);
+            ownerController.onSelectBall();
+        }
+
+        public override void update()
+        {
+            base.update();
+
+            if (Input.GetMouseButtonUp(0))
+            {
+                Debug.Log("[MoveState] changeState to Stay");
+                nextState = new StayState(ownerController);
+                return;
+            }
+
+            move();
+        }
+
+        public override void end()
+        {
+            base.end();
+
+            PuzzleManager.instance.unregisterCurrentOperationBall();
+            ownerController.offSelectBall();
+        }
+
+        private void move()
+        {
+            var inputPos = Input.mousePosition;
+
+            var desirePos = Camera.main.ScreenToWorldPoint(inputPos);
+            desirePos.z = 0.0f;
+            ///ここで範囲盤面範囲から座標調整を行う
+            var adjustedPos = ownerController.adjustPos(desirePos);
+
+            var currentPos = ownerController.transform.position;
+            var targetPos = Vector3.Lerp(currentPos, adjustedPos, 0.2f);
+            ownerController.transform.position = targetPos;
+        }
+
+
+    }
+
+    #endregion
+
+    public class BallController : MonoBehaviour
+	{
+        
 
         #region プロパティ
         public BallType ballType { get; set; }
@@ -216,7 +221,7 @@ namespace app
         /// <summary>
         /// 盤面にはみ出さないように移動座標を調整する
         /// </summary>
-        private Vector3 adjustPos(Vector3 desirePos)
+        public Vector3 adjustPos(Vector3 desirePos)
         {
             var result = desirePos;
 
@@ -254,16 +259,7 @@ namespace app
         #endregion
 
         #region 非公開メソッド
-        private void moveBall()
-        {
-            /// 入力処理
-            /// ボールをタッチされているか
-            /// タッチされていたら移動ステートへ
-            /// ステート変更
-            /// スプライト移動
-            /// 範囲判定
-            /// 置く
-        }
+       
         #endregion
     }
 }
