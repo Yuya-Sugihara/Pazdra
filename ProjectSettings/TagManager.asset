@@ -47,6 +47,9 @@ TagManager:
   - name: Ball
     uniqueID: 4131475021
     locked: 0
+  - name: SelectedBall
+    uniqueID: 1399721531
+    locked: 0
   - name: UI
     uniqueID: 3572168527
     locked: 0

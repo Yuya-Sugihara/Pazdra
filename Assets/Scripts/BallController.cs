@@ -69,6 +69,7 @@ namespace app
                     {
                         Debug.Log("[StayState] changeState to Move");
                         nextState = new MoveState(ownerController);
+                        return;
                     }
                 }
             }
@@ -96,6 +97,8 @@ namespace app
             public override void start()
             {
                 base.start();
+
+                ownerController.onSelectBall();                
             }
 
             public override void update()
@@ -106,14 +109,28 @@ namespace app
                 {
                     Debug.Log("[MoveState] changeState to Stay");
                     nextState = new StayState(ownerController);
+                    return;
                 }
 
-                //LogDrawer.drawLog("moving");
+                move();
             }
 
             public override void end()
             {
                 base.end();
+
+                ownerController.offSelectBall();
+            }
+
+            private void move()
+            {
+                var inputPos = Input.mousePosition;
+                
+                var worldPos = Camera.main.ScreenToWorldPoint(inputPos);
+                worldPos.z = 0.0f;
+                ownerController.transform.position = worldPos;
+                /// todo: 線形補間
+                //ownerController.transform.position = inputPos;
             }
         }
 
@@ -122,6 +139,7 @@ namespace app
         #region プロパティ
         public BallType ballType { get; set; }
         public Point boardPoint { get; set; }
+        public Transform ownerTransform { get; private set; }
         #endregion
 
         #region フィールド
@@ -133,8 +151,7 @@ namespace app
 		public void Awake()
 		{
 			SpriteRenderer = gameObject.GetComponent<SpriteRenderer>();
-
-            
+            ownerTransform = gameObject.GetComponent<Transform>();
 		}
 
 		void Start()
@@ -159,8 +176,7 @@ namespace app
         #endregion
 
         #region 公開メソッド
-        public void setSprite(Sprite sprite)
-		{
+        public void setSprite(Sprite sprite)		{
 			if (sprite == null)
 			{
 				Debug.LogError("[BallController] setSprite(): 引数がnullです。");
@@ -189,6 +205,23 @@ namespace app
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// ボールが選択された時の処理
+        /// </summary>
+        public void onSelectBall()
+        {
+            ///描画を優先する
+            //SpriteRenderer.sortingLayerName = "SelectedBall";
+            //SpriteRenderer.enabled = false;
+            Debug.Log("onSelectBall");
+        }
+
+        public void offSelectBall()
+        {
+            //SpriteRenderer.sortingLayerName = "Ball";
+            //SpriteRenderer.enabled = true;
         }
         #endregion
 

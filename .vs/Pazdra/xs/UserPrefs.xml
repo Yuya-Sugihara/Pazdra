@@ -1,11 +1,11 @@
 ﻿<Properties StartupConfiguration="{436A0EA7-FA30-DA30-7BA9-35681982EB9B}|">
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/MatrixArray.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/BoardController.cs">
     <Files>
       <File FileName="Assets/Scripts/PuzzleManager.cs" Line="22" Column="11" />
-      <File FileName="Assets/Scripts/BoardController.cs" Line="141" Column="30" />
-      <File FileName="Assets/Scripts/LogDrawer.cs" />
-      <File FileName="Assets/Scripts/BallController.cs" Line="16" Column="13" NotebookId="1" />
-      <File FileName="Assets/Scripts/MatrixArray.cs" Line="10" Column="16" NotebookId="1" />
+      <File FileName="Assets/Scripts/BoardController.cs" Line="215" Column="84" />
+      <File FileName="Assets/Scripts/LogDrawer.cs" Line="39" Column="20" />
+      <File FileName="Assets/Scripts/BallController.cs" Line="214" Column="39" NotebookId="1" />
+      <File FileName="Assets/Scripts/MatrixArray.cs" Line="94" Column="1" NotebookId="1" />
     </Files>
     <Pads>
       <Pad Id="MonoDevelop.Debugger.WatchPad">
@@ -13,6 +13,8 @@
           <Value>point</Value>
           <Value>YPOINTMAX</Value>
           <Value>Board</Value>
+          <Value>YMAX</Value>
+          <Value>boardPoint</Value>
         </State>
       </Pad>
     </Pads>
@@ -22,7 +24,8 @@
   <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="aa80c530-4fde-49d1-8f7e-3640814a129f" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
-      <Breakpoint file="/Users/sugiharayuukana/unity project/Pazdra/Assets/Scripts/BoardController.cs" relfile="Assets/Scripts/BoardController.cs" line="127" column="1" />
+      <Breakpoint file="/Users/sugiharayuukana/unity project/Pazdra/Assets/Scripts/MatrixArray.cs" relfile="Assets/Scripts/MatrixArray.cs" line="63" column="1" />
+      <Breakpoint file="/Users/sugiharayuukana/unity project/Pazdra/Assets/Scripts/MatrixArray.cs" relfile="Assets/Scripts/MatrixArray.cs" line="57" column="1" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MultiItemStartupConfigurations />
