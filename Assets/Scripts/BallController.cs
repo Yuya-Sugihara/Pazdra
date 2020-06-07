@@ -128,9 +128,12 @@ namespace app
             {
                 var inputPos = Input.mousePosition;
                 
-                var worldPos = Camera.main.ScreenToWorldPoint(inputPos);
-                worldPos.z = 0.0f;
-                ownerController.transform.position = worldPos;
+                var desirePos = Camera.main.ScreenToWorldPoint(inputPos);
+                desirePos.z = 0.0f;
+
+                var currentPos = ownerController.transform.position;
+                var targetPos = Vector3.Lerp(currentPos, desirePos, 0.2f);
+                ownerController.transform.position = targetPos;
                 /// todo: 線形補間
                 //ownerController.transform.position = inputPos;
             }
@@ -214,15 +217,13 @@ namespace app
         public void onSelectBall()
         {
             ///描画を優先する
-            //SpriteRenderer.sortingLayerName = "SelectedBall";
-            //SpriteRenderer.enabled = false;
+            SpriteRenderer.sortingLayerName = "SelectedBall";
             Debug.Log("onSelectBall");
         }
 
         public void offSelectBall()
         {
-            //SpriteRenderer.sortingLayerName = "Ball";
-            //SpriteRenderer.enabled = true;
+            SpriteRenderer.sortingLayerName = "Ball";            
         }
         #endregion
 
