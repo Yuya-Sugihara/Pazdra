@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,15 +8,20 @@ namespace app
     /// <summary>
     /// 盤面上の位置を保持するクラス
     /// </summary>
-    public class BoardPoint
+    public class Point
     {
         public int x { get; set; } = -1;
         public int y { get; set; } = -1;
 
-        public BoardPoint(int x, int y)
+        public Point(int x, int y)
         {
             this.x = x;
             this.y = y;
+        }
+
+        public static Point operator+ (Point lhs,Point rhs)
+        {
+            return new Point(lhs.x + rhs.x, lhs.y + rhs.y);
         }
     }
 
@@ -55,7 +61,7 @@ namespace app
          * (0,3) (1,3) (2,3) (3,3) (4,3) (5,3) 
          * (0,4) (1,4) (2,4) (3,4) (4,4) (5,4) 
          */
-        private BallController[,] Board;
+        private MatrixArray<BallController> Board;
         private SpriteRenderer Renderer;
         #endregion
 
@@ -80,7 +86,6 @@ namespace app
             #region DEBUG
             drawDebugLog();
             #endregion
-
         }
 
         /// <summary>
@@ -89,21 +94,120 @@ namespace app
         private void generateBoard()
         {
             ///盤面データテーブル作成
-            Board = new BallController[YPOINTMAX,XPOINTMAX];
+            Board = new MatrixArray<BallController>(XPOINTMAX, YPOINTMAX);
 
             for(int y =0;y<YPOINTMAX;y++)
             {
                 for(int x = 0;x<XPOINTMAX;x++)
                 {
-                    Board[y,x] = generateBall(BallType.Green, new BoardPoint(x, y));
+                    var boardPoint = new Point(x,y);
+                    ///　ここで設置するボールの色を設定する
+                    var ballType = selectGeneratedBallType(boardPoint);
+                    Board.setElement(generateBall(ballType, boardPoint),boardPoint);
                 }
             }
         }
 
         /// <summary>
+        /// 盤面情報をみて、次に生成するボールの色を選択する
+        /// </summary>
+        private BallType selectGeneratedBallType(Point point)
+        {
+            var selectable = new List<BallType>()
+            {
+                BallType.Red,
+                BallType.Blue,
+                BallType.Green,
+                BallType.Yellow,
+                BallType.Purple,
+                BallType.Pink
+            };
+
+            BallType upBallType = BallType.None;
+            BallType upUpBallType = BallType.None;
+            BallType downBallType = BallType.None;
+            BallType downDownBallType = BallType.None;
+
+            Debug.Log("x: " + point.x + " y: " + point.y);
+
+            if (point.y > 0)
+            {
+                upBallType = getBoardBallType(point, Direction.Up);
+                if (point.y > 1)
+                {
+                    upUpBallType = getBoardBallType(point, Direction.Up, 2);
+                }
+            }
+
+            if (point.y < YPOINTMAX - 1)
+            {
+                downBallType = getBoardBallType(point, Direction.Down);
+                if (point.y < YPOINTMAX - 2)
+                {
+                    downDownBallType = getBoardBallType(point, Direction.Down, 2);
+                }
+            }
+
+            Func<BallType, BallType, bool> isEqual = (type1, type2) =>
+            {
+                if (type1 == BallType.None)
+                    return false;
+                else if (type2 == BallType.None)
+                    return false;
+
+                return type1 == type2;
+            };
+
+
+            /// 判定 
+            if(isEqual(upBallType,upUpBallType) ||
+                isEqual(upBallType,downBallType) ||
+                isEqual(downBallType,downDownBallType))
+            {
+                selectable.Remove(upBallType);
+            }
+
+            BallType leftBallType = BallType.None;
+            BallType leftLeftBallType = BallType.None;
+            BallType rightBallType = BallType.None;
+            BallType rightRightBallType = BallType.None;
+
+            if (point.x > 0)
+            {
+                leftBallType = getBoardBallType(point, Direction.Left);
+                if (point.x > 1)
+                {
+                    leftLeftBallType = getBoardBallType(point, Direction.Left, 2);
+                }
+            }
+
+            if (point.x < XPOINTMAX - 1)
+            {
+                rightBallType = getBoardBallType(point, Direction.Right);
+                if (point.x < XPOINTMAX - 2)
+                {
+                    rightRightBallType = getBoardBallType(point, Direction.Right, 2);
+                }
+            }
+
+            /// 判定 左２個、右２個が同じになることがある
+            if (isEqual(leftBallType, leftLeftBallType) ||
+                isEqual(leftBallType, rightBallType) ||
+                isEqual(rightBallType, rightRightBallType))
+            {
+                selectable.Remove(leftBallType);
+            }
+
+
+            var rand = new System.Random();
+            return selectable[rand.Next(0,selectable.Count-1)];
+        }
+
+       
+        /// <summary>
         /// ボールプレハブをインスタンス化し生成する
         /// </summary>     
-        private BallController generateBall(BallType ballType, BoardPoint point)
+        private BallController generateBall(BallType ballType, Point point)
         {
             /// BoardPointの数値から、具体的な座標を計算し、生成する
             var newBallPos = convertPointToPos(point);
@@ -125,7 +229,7 @@ namespace app
         /// <summary>
         /// ボード位置のインデックスを座標に変換する
         /// </summary>
-        private Vector3 convertPointToPos(BoardPoint point)
+        private Vector3 convertPointToPos(Point point)
         {
             var centerPos = gameObject.GetComponent<Transform>().position;
             ///一つのセルは正方形なので、一辺の長さはxとyで同じ
@@ -166,6 +270,15 @@ namespace app
             return null;
         }
 
+        private BallType getBoardBallType(Point point,Direction dir,int length = 1)
+        {
+            var ballController = Board.getElementByDirection(point,dir,length);
+            if (ballController == null)
+                return BallType.None;
+
+            return ballController.ballType;
+        }
+
         #region DEBUG
         private void drawDebugLog()
         {
@@ -175,7 +288,7 @@ namespace app
             {
                 for (int x = 0; x < XPOINTMAX; x++)
                 {
-                    log += Board[y, x].ballType.ToString() + " ";
+                    log += Board.getElement(x,y).ballType.ToString() + " ";
                 }
 
                 log += "\n";

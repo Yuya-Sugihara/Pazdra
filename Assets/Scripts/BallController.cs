@@ -12,7 +12,8 @@ namespace app
 		Green,
 		Yellow,
 		Purple,
-		Pink
+		Pink,
+        None
 	};
 	#endregion
 
@@ -20,7 +21,7 @@ namespace app
 	{
         #region プロパティ
         public BallType ballType { get; set; }
-        public BoardPoint boardPoint { get; set; }
+        public Point boardPoint { get; set; }
         #endregion
 
         #region フィールド
