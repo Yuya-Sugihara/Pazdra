@@ -213,7 +213,7 @@ namespace app
             var newBallPos = convertPointToPos(point);
 
             var newBall = Instantiate(BallPrefab, newBallPos, Quaternion.identity);
-
+            newBall.name = ballType.ToString();
             /// コントローラーセットアップ
             var ballContorller = newBall.GetComponent<BallController>();
             if (ballContorller != null)
@@ -288,7 +288,7 @@ namespace app
             {
                 for (int x = 0; x < XPOINTMAX; x++)
                 {
-                    log += Board.getElement(x,y).ballType.ToString() + " ";
+                    log += Board.getElement(x,y).currentBallState.GetType().Name + " ";
                 }
 
                 log += "\n";

@@ -33,7 +33,9 @@ namespace app
             }
 
             public virtual void start()
-            { }
+            {
+                nextState = null;
+            }
 
             public virtual void update()
             { }
@@ -140,11 +142,11 @@ namespace app
         public BallType ballType { get; set; }
         public Point boardPoint { get; set; }
         public Transform ownerTransform { get; private set; }
+        public BallStateBase currentBallState { get; private set; }
         #endregion
 
         #region フィールド
         private SpriteRenderer SpriteRenderer;
-        private BallStateBase CurrentBallState;
 		#endregion
 
 		#region MonoBehaviorメソッド
@@ -156,21 +158,21 @@ namespace app
 
 		void Start()
 		{
-            CurrentBallState = new StayState(this);
-            CurrentBallState.start();
+            currentBallState = new StayState(this);
+            currentBallState.start();
         }
 
 
 		void Update()
 		{
-            CurrentBallState.update();
+            currentBallState.update();
 
             ///　ステートの変更
-            if(CurrentBallState.nextState != null)
+            if(currentBallState.nextState != null)
             {
-                CurrentBallState.end();
-                CurrentBallState = CurrentBallState.nextState;
-                CurrentBallState.start();
+                currentBallState.end();
+                currentBallState = currentBallState.nextState;
+                currentBallState.start();
             }
         } 
         #endregion
@@ -194,13 +196,12 @@ namespace app
 
         public bool isTouched()
         {
-            ///入力座標の確認
             var inputPos = Input.mousePosition;
             var ray = Camera.main.ScreenPointToRay(inputPos);
             var result = Physics2D.Raycast((Vector2)ray.origin, (Vector2)ray.direction);
-            if(result)
+
+            if (result && result.transform.gameObject == gameObject)
             {
-                Debug.Log("touched ball: " + result.transform.GetComponent<BallController>().ballType);
                 return true;
             }
 
