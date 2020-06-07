@@ -130,13 +130,15 @@ namespace app
                 
                 var desirePos = Camera.main.ScreenToWorldPoint(inputPos);
                 desirePos.z = 0.0f;
+                ///ここで範囲盤面範囲から座標調整を行う
+                var adjustedPos = ownerController.adjustPos(desirePos);
 
                 var currentPos = ownerController.transform.position;
-                var targetPos = Vector3.Lerp(currentPos, desirePos, 0.2f);
+                var targetPos = Vector3.Lerp(currentPos, adjustedPos, 0.2f);
                 ownerController.transform.position = targetPos;
-                /// todo: 線形補間
-                //ownerController.transform.position = inputPos;
             }
+
+           
         }
 
         #endregion
@@ -209,6 +211,30 @@ namespace app
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// 盤面にはみ出さないように移動座標を調整する
+        /// </summary>
+        private Vector3 adjustPos(Vector3 desirePos)
+        {
+            var result = desirePos;
+
+            var boardPos = PuzzleManager.instance.getBoardPos();
+            var boardSize = PuzzleManager.instance.getBoardSize();
+            var ballRadius = SpriteRenderer.size * 0.5f;
+
+            ///縦方向のクランプ ボールの半径を考慮
+            var boardUp = boardPos.y + boardSize.y * 0.5f;
+            var boardBottom = boardPos.y - boardSize.y * 0.5f;
+            result.y = Mathf.Clamp(result.y, boardBottom + ballRadius.y, boardUp - ballRadius.y);
+
+            ///横方向のクランプ　ボールの半径を考慮
+            var boardLeft = boardPos.x - boardSize.x * 0.5f;
+            var boardRight = boardPos.x + boardSize.x * 0.5f;
+            result.x = Mathf.Clamp(result.x, boardLeft + ballRadius.x, boardRight - ballRadius.x);
+
+            return result;
         }
 
         /// <summary>

@@ -65,22 +65,22 @@ namespace app
          */
         private MatrixArray<BallController> Board;
         private SpriteRenderer Renderer;
+        private Transform Transform;
         #endregion
 
         public void Awake()
         {
-            Renderer = gameObject.GetComponent<SpriteRenderer>();    
+            Renderer = gameObject.GetComponent<SpriteRenderer>();
+            Transform = gameObject.GetComponent<Transform>();
         }
 
         public void Start()
         {
+            /// マネージャクラスに登録をリクエストする
+            PuzzleManager.instance.registerBoardController(this);
+
             /// 盤面生成
             generateBoard();
-        }
-
-        public void Update()
-        {
-            
         }
 
         public void LateUpdate()
@@ -90,6 +90,22 @@ namespace app
             #endregion
         }
 
+        #region 公開メソッド
+        public Vector3 getBoardPos()
+        {
+            return Transform.position;
+        }
+
+        /// <summary>
+        /// 盤面スプライトのサイズを返す
+        /// </summary>
+        public Vector2 getBoardSize()
+        {
+            return Renderer.size;
+        }
+        #endregion
+
+        #region 非公開メソッド
         /// <summary>
         /// 盤面上のボールを生成する
         /// </summary>
@@ -298,5 +314,7 @@ namespace app
         }
 
         #endregion
+        #endregion
+
     }
 }
