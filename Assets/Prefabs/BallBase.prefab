@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5855216911658131194}
   - component: {fileID: 1434980999325502311}
   - component: {fileID: 7701897373644859570}
+  - component: {fileID: 7997885786562011684}
   m_Layer: 5
   m_Name: BallBase
   m_TagString: Untagged
@@ -94,3 +95,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d122bb3036794edca6c1175daceb6f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!58 &7997885786562011684
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5809823994854208683}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: -0.002673984, y: -0.003287435}
+  serializedVersion: 2
+  m_Radius: 0.6347808

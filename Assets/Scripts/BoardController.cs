@@ -128,8 +128,6 @@ namespace app
             BallType downBallType = BallType.None;
             BallType downDownBallType = BallType.None;
 
-            Debug.Log("x: " + point.x + " y: " + point.y);
-
             if (point.y > 0)
             {
                 upBallType = getBoardBallType(point, Direction.Up);
