@@ -224,7 +224,12 @@ namespace app
 
     public class BallController : MonoBehaviour
 	{
-        
+        public enum SwapReasonType
+        {
+            Move,   /// 移動した
+            Swap,   /// 入れ替えを要求された
+            None,
+        }
 
         #region プロパティ
         public BallType ballType { get; set; }
@@ -239,18 +244,27 @@ namespace app
         {
             get { return currentBallState.GetType() == typeof(MoveState); }
         }
+        public bool isMoveEnd
+        {
+            get
+            {
+                return !isOperating && isMoved;
+            }
+        }
         #endregion
 
         #region フィールド
         private SpriteRenderer SpriteRenderer;
-		#endregion
+        private bool isMoved;
+        #endregion
 
 		#region MonoBehaviorメソッド
 		public void Awake()
 		{
 			SpriteRenderer = gameObject.GetComponent<SpriteRenderer>();
             ownerTransform = gameObject.GetComponent<Transform>();
-		}
+            isMoved = false;
+        }
 
 		void Start()
 		{
@@ -358,6 +372,20 @@ namespace app
             return PuzzleManager.instance.getBoardPos(boardPoint);
         }
 
+        public void onSwap(SwapReasonType reason)
+        {
+            if(reason == SwapReasonType.Move)
+            {
+                ///　移動したよ
+                isMoved = true;
+            }
+            else if(reason == SwapReasonType.Swap)
+            {
+                /// 入れ替えステートに入るよ
+                currentBallState.requestSwapState();
+            }
+
+        }
         #endregion
 
         #region 非公開メソッド

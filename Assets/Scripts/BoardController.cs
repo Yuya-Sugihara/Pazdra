@@ -2,8 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
-using UnityEditor.SceneManagement;
 
 namespace app
 {
@@ -133,9 +131,6 @@ namespace app
 
         public void Update()
         {
-            /////////////////////////////////////////
-            /// 操作中のボールの位置を監視する
-            /////////////////////////////////////////
             updateBoard();
         }
 
@@ -439,8 +434,8 @@ namespace app
 
         private void onSwapBall(BallController origin, BallController moveTo)
         {
-            ///moveTo側を指定ポイントへ移動するステートへ変更する
-            moveTo.currentBallState.requestSwapState();
+            origin.onSwap(BallController.SwapReasonType.Move);
+            moveTo.onSwap(BallController.SwapReasonType.Swap);
         }
 
         /// <summary>
