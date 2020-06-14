@@ -47,6 +47,12 @@ namespace app
             BoardController.unregisterOperatingBall();
         }
 
+        public Vector3 getBoardPos(Point point)
+        {
+            return BoardController.getBoardPos(point);
+        }
+        #endregion
+
         #region データアクセサ
         public Vector3 getBoardPos()
         {

@@ -10,10 +10,10 @@ namespace app
     /// <summary>
     /// 盤面上の位置を保持するクラス
     /// </summary>
-    public class Point
+    public struct Point
     {
-        public int x { get; set; } = -1;
-        public int y { get; set; } = -1;
+        public int x { get; set; }
+        public int y { get; set; }
 
         public Point(int x, int y)
         {
@@ -31,6 +31,44 @@ namespace app
     {
         public Vector3 cellPos { get; set; }
         public Vector2 cellSize { get; set; }
+
+        /// <summary>
+        /// セルからの位置からどの方向に存在するか返す
+        /// </summary>
+        public Direction[] getDirectionFromCell(Vector3 pos)
+        {
+            /// 斜め判定をするためにサイズを2に設定する
+            /// 要素１は縦方向の判定結果
+            /// 要素２は横方向の判定結果
+            var result = new Direction[2]
+                {
+                    Direction.None,
+                    Direction.None
+                };
+
+            /// 左判定
+            var left = cellPos.x - cellSize.x * 0.5f;
+            if (pos.x < left)
+                result[0] = Direction.Left;
+
+            /// 右判定
+            var right = cellPos.x + cellSize.x * 0.5f;
+            if (right < pos.x)
+                result[0] = Direction.Right;
+
+            /// 上判定
+            var up = cellPos.y + cellSize.y * 0.5f;
+            if (up < pos.y)
+                result[1] = Direction.Up;
+
+            /// 下判定
+            var bottom = cellPos.y - cellSize.y * 0.5f;
+            if (pos.y < bottom)
+                result[1] = Direction.Down;
+
+            DebugEx.drawRect(up, bottom, left, right);
+            return result;
+        }
     }
 
     /// <summary>
@@ -98,7 +136,7 @@ namespace app
             /////////////////////////////////////////
             /// 操作中のボールの位置を監視する
             /////////////////////////////////////////
-
+            updateBoard();
         }
 
         public void LateUpdate()
@@ -149,6 +187,12 @@ namespace app
         public void unregisterOperatingBall()
         {
             currentOperatingBall = null;
+        }
+        #endregion
+
+        public Vector3 getBoardPos(Point point)
+        {
+            return convertPointToPos(point);
         }
         #endregion
 
@@ -320,6 +364,106 @@ namespace app
 
         #endregion
 
+        private void updateBoard()
+        {
+            var moveDirection = getCurrentBallMovedDirection();
+            if(moveDirection[0] == Direction.None &&
+                moveDirection[1] == Direction.None)
+            {
+                /// 移動しなかった
+                return;
+            }
+
+            Debug.Log("ball moved");
+
+            /// 移動先のボール情報を取得する
+            BallController BallMoveTo = null;
+            var horizontalDirection = moveDirection[0];
+            var verticalDirection = moveDirection[1];
+            
+            if (horizontalDirection != Direction.None) /// 横方向のボールを取得
+            {
+                Debug.Log("moved horizontal");
+                BallMoveTo = Board.getElementByDirection(
+                    currentOperatingBall.boardPoint,
+                    horizontalDirection);
+            }
+            else if (verticalDirection != Direction.None)     ///縦方向のボールを取得
+            {
+                Debug.Log("moved horizontal");
+                BallMoveTo = Board.getElementByDirection(
+                    currentOperatingBall.boardPoint,
+                    verticalDirection);
+            }
+
+            /// 斜め方向のボールを取得
+            if(horizontalDirection != Direction.None &&
+                verticalDirection != Direction.None)
+            {
+                Debug.Log("moved horizontal and vertical");
+                ///斜め方向に移動する時は、必ず水平方向の処理を行うので、引数は垂直方向で良い
+                BallMoveTo = Board.getElementByDirection(
+                    BallMoveTo.boardPoint,
+                    verticalDirection);
+            }
+
+            swapBall(currentOperatingBall,BallMoveTo);
+        }
+
+        private void swapBall(BallController origin,BallController moveTo)
+        {
+            /// 入れ替え中などは入れ替えできない 
+            if (!origin.isOperating || !moveTo.canSwap)
+                return;
+
+            /// ボードインデックスの入れ替え
+            var originPoint = new Point(origin.boardPoint.x, origin.boardPoint.y);
+            var moveToPoint = new Point(moveTo.boardPoint.x, moveTo.boardPoint.y);
+
+            Debug.Log("swap start");
+            Debug.Log("originPoint.x: " + origin.boardPoint.x + "originPoint.y" + origin.boardPoint.y);
+            Debug.Log("moveToPoint.x: " + moveTo.boardPoint.x + "moveToPoint.y" + moveTo.boardPoint.y); 
+            ///入れ替え
+            origin.boardPoint = moveToPoint;
+            moveTo.boardPoint = originPoint;
+            Debug.Log("swap end");
+            Debug.Log("originPoint.x: " + origin.boardPoint.x + "originPoint.y" + origin.boardPoint.y);
+            Debug.Log("moveToPoint.x: " + moveTo.boardPoint.x + "moveToPoint.y" + moveTo.boardPoint.y);
+
+            /// ボード上での入れ替え
+            Board.setElement(origin, origin.boardPoint);
+            Board.setElement(moveTo, moveTo.boardPoint);
+
+            onSwapBall(origin,moveTo);
+        }
+
+        private void onSwapBall(BallController origin, BallController moveTo)
+        {
+            ///moveTo側を指定ポイントへ移動するステートへ変更する
+            moveTo.currentBallState.requestSwapState();
+        }
+
+        /// <summary>
+        /// 操作中のボールがセル外に移動したか判定する
+        /// </summary>
+        private Direction[] getCurrentBallMovedDirection()
+        {
+            var result = new Direction[2]
+            {
+                Direction.None,
+                Direction.None
+            };
+
+            if (currentOperatingBall == null)
+                return result;
+
+            var existingCell = convertPointToCell(currentOperatingBall.boardPoint);
+            var operatingBallPos = currentOperatingBall.ownerTransform.position;
+            result = existingCell.getDirectionFromCell(operatingBallPos);
+
+            return result;
+        }
+
         #region データ変換
         /// <summary>
         /// ボード位置のインデックスを座標に変換する
@@ -351,10 +495,7 @@ namespace app
             return cell;
         }
         #endregion
-
-
-      
-        
+  
         #region DEBUG
         private void drawDebugLog()
         {
@@ -364,7 +505,7 @@ namespace app
             {
                 for (int x = 0; x < XPOINTMAX; x++)
                 {
-                    log += Board.getElement(x,y).currentBallState.GetType().Name + " ";
+                    log += Board.getElement(x,y).currentBallState.GetType() + " ";
                 }
 
                 log += "\n";
@@ -374,6 +515,7 @@ namespace app
         }
 
         #endregion
+
         #endregion
 
     }

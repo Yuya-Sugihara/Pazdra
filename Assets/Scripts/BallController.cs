@@ -41,12 +41,22 @@ namespace app
 
         public virtual void end()
         { }
+
+        /// <summary>
+        /// 複数のステート移動リクエストが必要な場合はenumで指定できるようにする
+        /// </summary>
+        public void requestSwapState()
+        {
+            nextState = new SwapState(ownerController);
+        }
     }
     /// <summary>
     /// 待機ステート
     /// </summary>
     public class StayState : BallStateBase
     {
+        private Vector3 TargetPos;
+
         public StayState(BallController controller) :
             base(controller)
         { }
@@ -55,6 +65,8 @@ namespace app
         public override void start()
         {
             base.start();
+
+            TargetPos = ownerController.getBoardPos();
         }
 
         public override void update()
@@ -73,11 +85,21 @@ namespace app
                     return;
                 }
             }
+
+            move();
         }
 
         public override void end()
         {
             base.end();
+        }
+
+        public void move()
+        {
+            var currentPos = ownerController.ownerTransform.position;
+            var nextPos = Vector3.Lerp(currentPos, TargetPos, 0.3f);
+
+            ownerController.ownerTransform.position = nextPos;
         }
     }
 
@@ -99,6 +121,7 @@ namespace app
         {
             base.start();
 
+            ///　操作中ボールの登録
             PuzzleManager.instance.registerCurrentOperationBall(ownerController);
             ownerController.onSelectBall();
         }
@@ -138,8 +161,63 @@ namespace app
             var targetPos = Vector3.Lerp(currentPos, adjustedPos, 0.2f);
             ownerController.transform.position = targetPos;
         }
+    }
 
+    /// <summary>
+    /// 入れ替わりステート
+    /// </summary>
+    public class SwapState : BallStateBase
+    {
+        private float SwapTime = 0.0f;
+        private float SwapTimeMax = 0.1f;
+        private Vector3 PrevPos = Vector3.zero;
+        private Vector3 TargetPos = Vector3.zero; 
 
+        public SwapState(BallController controller) :
+            base(controller)
+        { }
+
+        /// <summary>
+        /// 入力が続いている間入力されている場所へ移動する
+        /// 入力が終わるとステート変更
+        /// 開始時に操作時間の初期化→更新していく
+        /// </summary>
+        public override void start()
+        {
+            base.start();
+
+            /// タイマー初期化
+            SwapTime = 0.0f;
+            PrevPos = ownerController.transform.position;
+            TargetPos = ownerController.getBoardPos();
+        }
+
+        public override void update()
+        {
+            base.update();
+
+            ///終了
+            if(SwapTime >= SwapTimeMax)
+            {
+                nextState = new StayState(ownerController);
+                return;
+            }
+
+            move();
+        }
+
+        public override void end()
+        {
+            base.end();
+        }
+
+        private void move()
+        {
+            SwapTime += Time.deltaTime;
+            var nextPos = Vector3.Lerp(PrevPos, TargetPos, SwapTime/SwapTimeMax);
+
+            ownerController.ownerTransform.position = nextPos;
+        }
     }
 
     #endregion
@@ -153,6 +231,14 @@ namespace app
         public Point boardPoint { get; set; }
         public Transform ownerTransform { get; private set; }
         public BallStateBase currentBallState { get; private set; }
+        public bool canSwap
+        {
+            get { return currentBallState.GetType() != typeof(SwapState); }
+        }
+        public bool isOperating
+        {
+            get { return currentBallState.GetType() == typeof(MoveState); }
+        }
         #endregion
 
         #region フィールド
@@ -175,6 +261,9 @@ namespace app
 
 		void Update()
 		{
+            if (currentBallState == null)
+                Debug.Log("CurrentBallState is null");
+
             currentBallState.update();
 
             ///　ステートの変更
@@ -188,7 +277,8 @@ namespace app
         #endregion
 
         #region 公開メソッド
-        public void setSprite(Sprite sprite)		{
+        public void setSprite(Sprite sprite)
+        {
 			if (sprite == null)
 			{
 				Debug.LogError("[BallController] setSprite(): 引数がnullです。");
@@ -249,13 +339,25 @@ namespace app
         {
             ///描画を優先する
             SpriteRenderer.sortingLayerName = "SelectedBall";
-            Debug.Log("onSelectBall");
+
+            ///操作対象ボールに設定
+            PuzzleManager.instance.registerCurrentOperationBall(this);
         }
 
         public void offSelectBall()
         {
-            SpriteRenderer.sortingLayerName = "Ball";            
+            /// 描画優先を解除する
+            SpriteRenderer.sortingLayerName = "Ball";
+
+            /// 操作対象ボールを解除する
+            PuzzleManager.instance.unregisterCurrentOperationBall();
         }
+
+        public Vector3 getBoardPos()
+        {
+            return PuzzleManager.instance.getBoardPos(boardPoint);
+        }
+
         #endregion
 
         #region 非公開メソッド

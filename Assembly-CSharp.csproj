@@ -64,6 +64,7 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\BallController.cs" />
     <Compile Include="Assets\Scripts\BoardController.cs" />
+    <Compile Include="Assets\Scripts\DebugCustom.cs" />
     <Compile Include="Assets\Scripts\LogDrawer.cs" />
     <Compile Include="Assets\Scripts\MatrixArray.cs" />
     <Compile Include="Assets\Scripts\PuzzleManager.cs" />

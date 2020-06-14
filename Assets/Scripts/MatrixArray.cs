@@ -10,6 +10,7 @@ namespace app
         Down,
         Left,
         Right,
+        None,
     }
 
     /// <summary>
@@ -72,7 +73,7 @@ namespace app
         /// </summary>
         public T getElementByDirection(Point point, Direction dir,int length = 1)
         {
-            Point offset = null;
+            Point offset = new Point(0,0);
             switch(dir)
             {
                 case Direction.Up:
