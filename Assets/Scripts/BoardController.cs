@@ -112,6 +112,8 @@ namespace app
         private MatrixArray<BallController> Board;
         private SpriteRenderer Renderer;
         private Transform Transform;
+
+        private bool IsOperationEnd = false;
         #endregion
 
         public void Awake()
@@ -132,6 +134,11 @@ namespace app
         public void Update()
         {
             updateBoard();
+
+            if(IsOperationEnd)
+            {
+                Debug.Log("faf");
+            }
         }
 
         public void LateUpdate()
@@ -184,6 +191,12 @@ namespace app
             currentOperatingBall = null;
         }
         #endregion
+
+        public void notifyOperationEnd()
+        {
+            /// ボール操作終了
+            IsOperationEnd = true;
+        }
 
         public Vector3 getBoardPos(Point point)
         {

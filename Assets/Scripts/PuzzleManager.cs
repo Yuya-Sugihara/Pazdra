@@ -53,6 +53,12 @@ namespace app
         }
         #endregion
 
+        /// ボール操作終了時に呼ばれる
+        public void notifyOperationEnd()
+        {
+            BoardController.notifyOperationEnd();
+        }
+
         #region データアクセサ
         public Vector3 getBoardPos()
         {

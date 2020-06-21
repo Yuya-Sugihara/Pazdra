@@ -18,7 +18,6 @@ namespace app
     #endregion
 
     #region 定義
-
     public class BallStateBase
     {
         public BallStateBase nextState { get; set; }
@@ -50,6 +49,7 @@ namespace app
             nextState = new SwapState(ownerController);
         }
     }
+
     /// <summary>
     /// 待機ステート
     /// </summary>
@@ -244,17 +244,11 @@ namespace app
         {
             get { return currentBallState.GetType() == typeof(MoveState); }
         }
-        public bool isMoveEnd
-        {
-            get
-            {
-                return !isOperating && isMoved;
-            }
-        }
         #endregion
 
         #region フィールド
         private SpriteRenderer SpriteRenderer;
+        ///時間制御に使用する
         private bool isMoved;
         #endregion
 
@@ -365,6 +359,7 @@ namespace app
 
             /// 操作対象ボールを解除する
             PuzzleManager.instance.unregisterCurrentOperationBall();
+            PuzzleManager.instance.notifyOperationEnd();
         }
 
         public Vector3 getBoardPos()
